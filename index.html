@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Challenge Game | CSC336 Lab Mid</title>
+  <!-- Google Fonts for modern, crisp typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background decorative glows -->
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+
+  <!-- Sound Toggle Button (Uses clean Web Audio API) -->
+  <button id="sound-toggle-btn" class="icon-btn sound-btn" title="Toggle Sound (Mute/Unmute)">
+    <span id="sound-icon">🔊</span>
+  </button>
+
+  <!-- ========================================================
+       SCREEN 1: HOME SCREEN (Mode Selection & Difficulties)
+       ======================================================== -->
+  <main id="home-screen" class="screen active">
+    <header class="app-header">
+      <div class="badge">CSC336 – Web Technologies Lab Mid</div>
+      <h1 class="main-title">Typing Challenge <span class="gradient-text">Game</span></h1>
+      <p class="subtitle">Test your typing speed, letter recognition, and keyboard precision with dual challenge modes.</p>
+    </header>
+
+    <!-- Global Difficulty Selector -->
+    <section class="difficulty-section">
+      <label class="section-label">Select Difficulty Level:</label>
+      <div class="difficulty-pill-group" role="radiogroup" aria-label="Difficulty Selection">
+        <button type="button" class="diff-btn active" data-difficulty="easy">
+          <span class="diff-title">Easy</span>
+          <span class="diff-desc">Gentle speed & home-row keys</span>
+        </button>
+        <button type="button" class="diff-btn" data-difficulty="medium">
+          <span class="diff-title">Medium</span>
+          <span class="diff-desc">Balanced speed & extended keys</span>
+        </button>
+        <button type="button" class="diff-btn" data-difficulty="hard">
+          <span class="diff-title">Hard</span>
+          <span class="diff-desc">Fast action & full alphabet</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Game Modes Selection Cards -->
+    <section class="modes-container">
+      <!-- Mode A Card -->
+      <div class="mode-card" id="card-mode-bubbles">
+        <div class="mode-card-header">
+          <div class="mode-icon bubble-icon-style">🫧</div>
+          <span class="mode-tag">Mode A</span>
+        </div>
+        <h2 class="mode-title">Bubbles Challenge</h2>
+        <p class="mode-subtitle">Letter Recognition & Reflexes</p>
+        <ul class="mode-features">
+          <li>5+ letter bubbles float upwards simultaneously</li>
+          <li>Type matching letter to pop & score <strong>+10 pts</strong></li>
+          <li>Incorrect key deduction: <strong>-2 pts</strong></li>
+          <li>Game over if <strong>6 bubbles</strong> escape to the top</li>
+          <li>Speed increases with chosen difficulty</li>
+        </ul>
+        <button class="primary-btn start-mode-btn" data-start-mode="bubbles">
+          <span>Play Bubbles</span>
+          <span class="arrow-icon">→</span>
+        </button>
+      </div>
+
+      <!-- Mode B Card -->
+      <div class="mode-card" id="card-mode-keymagnet">
+        <div class="mode-card-header">
+          <div class="mode-icon magnet-icon-style">🎯</div>
+          <span class="mode-tag">Mode B</span>
+        </div>
+        <h2 class="mode-title">KeyMagnet Challenge</h2>
+        <p class="mode-subtitle">Keyboard Precision & Muscle Memory</p>
+        <ul class="mode-features">
+          <li>Target key displayed with visual keyboard layout</li>
+          <li>Practice home-row keys (A, S, D, F, J, K, L)</li>
+          <li>Instant green/red key feedback on press</li>
+          <li>Tracks accuracy and average response time (ms)</li>
+          <li>Time limit per key based on difficulty</li>
+        </ul>
+        <button class="primary-btn start-mode-btn" data-start-mode="keymagnet">
+          <span>Play KeyMagnet</span>
+          <span class="arrow-icon">→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Quick Info Footer -->
+    <footer class="app-footer">
+      <p>Built with <strong>HTML5, CSS3, & JavaScript (ES6+)</strong> | COMSATS University Islamabad, Vehari Campus</p>
+    </footer>
+  </main>
+
+
+  <!-- ========================================================
+       SCREEN 2: MODE A - BUBBLES GAME
+       ======================================================== -->
+  <section id="bubbles-screen" class="screen">
+    <!-- Top HUD Bar -->
+    <header class="game-hud">
+      <div class="hud-left">
+        <button class="hud-btn home-nav-btn" title="Back to Home Menu">
+          <span>🏠 Home</span>
+        </button>
+        <div class="hud-pill">
+          <span class="hud-label">Mode:</span>
+          <span class="hud-value highlight">Bubbles</span>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">Diff:</span>
+          <span id="bubbles-diff-display" class="hud-value badge-pill">Easy</span>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <!-- Score Display -->
+        <div class="stat-box">
+          <span class="stat-label">SCORE</span>
+          <span id="bubbles-score" class="stat-value">0</span>
+        </div>
+        <!-- Misses Display (Max 6 misses) -->
+        <div class="stat-box">
+          <span class="stat-label">MISSES</span>
+          <div class="misses-tracker" id="bubbles-misses-container">
+            <span class="miss-dot" data-index="1"></span>
+            <span class="miss-dot" data-index="2"></span>
+            <span class="miss-dot" data-index="3"></span>
+            <span class="miss-dot" data-index="4"></span>
+            <span class="miss-dot" data-index="5"></span>
+            <span class="miss-dot" data-index="6"></span>
+          </div>
+          <span class="stat-subtext"><span id="bubbles-miss-count">0</span> / 6 Max</span>
+        </div>
+        <!-- Accuracy Display -->
+        <div class="stat-box">
+          <span class="stat-label">ACCURACY</span>
+          <span id="bubbles-accuracy" class="stat-value">100%</span>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <button id="bubbles-restart-btn" class="hud-btn restart-action-btn" title="Restart with current difficulty">
+          <span>🔄 Restart</span>
+        </button>
+        <button id="bubbles-reset-btn" class="hud-btn reset-action-btn" title="Reset and return to menu">
+          <span>✕ Reset</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Visual Feedback Notification Toast -->
+    <div id="bubbles-feedback" class="feedback-banner"></div>
+
+    <!-- The Playfield Container where bubbles float upward -->
+    <div id="bubbles-arena" class="bubbles-arena">
+      <!-- Top boundary warning line -->
+      <div class="arena-boundary-line">
+        <span class="boundary-label">⚠️ DANGER BOUNDARY (BUBBLE ESCAPE ZONE) ⚠️</span>
+      </div>
+      <!-- Bubbles will be injected dynamically here via JavaScript -->
+    </div>
+
+    <!-- On-screen helper tip -->
+    <div class="game-instruction-bar">
+      <span>⌨️ Press the matching letter on your keyboard before the bubble reaches the top line!</span>
+    </div>
+  </section>
+
+
+  <!-- ========================================================
+       SCREEN 3: MODE B - KEYMAGNET GAME
+       ======================================================== -->
+  <section id="keymagnet-screen" class="screen">
+    <!-- Top HUD Bar -->
+    <header class="game-hud">
+      <div class="hud-left">
+        <button class="hud-btn home-nav-btn" title="Back to Home Menu">
+          <span>🏠 Home</span>
+        </button>
+        <div class="hud-pill">
+          <span class="hud-label">Mode:</span>
+          <span class="hud-value highlight">KeyMagnet</span>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">Diff:</span>
+          <span id="keymagnet-diff-display" class="hud-value badge-pill">Easy</span>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <!-- Score Display -->
+        <div class="stat-box">
+          <span class="stat-label">SCORE</span>
+          <span id="keymagnet-score" class="stat-value">0</span>
+        </div>
+        <!-- Correct / Incorrect Counts -->
+        <div class="stat-box">
+          <span class="stat-label">HITS / MISS</span>
+          <span class="stat-value">
+            <span id="keymagnet-correct-count" class="text-green">0</span> / 
+            <span id="keymagnet-wrong-count" class="text-red">0</span>
+          </span>
+        </div>
+        <!-- Accuracy -->
+        <div class="stat-box">
+          <span class="stat-label">ACCURACY</span>
+          <span id="keymagnet-accuracy" class="stat-value">100%</span>
+        </div>
+        <!-- Average Response Time -->
+        <div class="stat-box">
+          <span class="stat-label">AVG TIME</span>
+          <span id="keymagnet-avg-time" class="stat-value">0 ms</span>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <button id="keymagnet-restart-btn" class="hud-btn restart-action-btn" title="Restart with current difficulty">
+          <span>🔄 Restart</span>
+        </button>
+        <button id="keymagnet-reset-btn" class="hud-btn reset-action-btn" title="Reset and return to menu">
+          <span>✕ Reset</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Visual Feedback Notification Toast -->
+    <div id="keymagnet-feedback" class="feedback-banner"></div>
+
+    <!-- Magnet Target Presentation Arena -->
+    <div class="keymagnet-arena">
+      <!-- Target Display Card -->
+      <div class="target-card-container">
+        <div class="target-card-header">
+          <span class="target-card-title">TARGET KEY</span>
+          <!-- Key Countdown Progress Bar -->
+          <div class="key-timer-bar-bg">
+            <div id="key-timer-bar" class="key-timer-bar-fill"></div>
+          </div>
+        </div>
+
+        <div id="magnet-target-display" class="magnet-target-display">
+          <span id="target-letter-display">A</span>
+        </div>
+
+        <div class="target-card-footer">
+          <span id="keymagnet-keyset-info" class="keyset-badge">Home Row Practice: A S D F J K L</span>
+          <div class="target-timer-text">Time: <span id="keymagnet-countdown-val">3.0</span>s</div>
+        </div>
+      </div>
+
+      <!-- Interactive Visual Keyboard Layout -->
+      <div class="visual-keyboard-container">
+        <div class="keyboard-header">
+          <span>Virtual Precision Keyboard</span>
+          <span class="keyboard-legend">
+            <span class="legend-dot legend-target"></span> Target
+            <span class="legend-dot legend-correct"></span> Correct
+            <span class="legend-dot legend-wrong"></span> Miss
+          </span>
+        </div>
+
+        <div id="virtual-keyboard" class="virtual-keyboard">
+          <!-- Row 1: Numbers -->
+          <div class="kb-row">
+            <div class="key" data-key="1">1</div>
+            <div class="key" data-key="2">2</div>
+            <div class="key" data-key="3">3</div>
+            <div class="key" data-key="4">4</div>
+            <div class="key" data-key="5">5</div>
+            <div class="key" data-key="6">6</div>
+            <div class="key" data-key="7">7</div>
+            <div class="key" data-key="8">8</div>
+            <div class="key" data-key="9">9</div>
+            <div class="key" data-key="0">0</div>
+          </div>
+          <!-- Row 2: Q W E R T Y U I O P -->
+          <div class="kb-row">
+            <div class="key" data-key="Q">Q</div>
+            <div class="key" data-key="W">W</div>
+            <div class="key" data-key="E">E</div>
+            <div class="key" data-key="R">R</div>
+            <div class="key" data-key="T">T</div>
+            <div class="key" data-key="Y">Y</div>
+            <div class="key" data-key="U">U</div>
+            <div class="key" data-key="I">I</div>
+            <div class="key" data-key="O">O</div>
+            <div class="key" data-key="P">P</div>
+          </div>
+          <!-- Row 3: A S D F G H J K L -->
+          <div class="kb-row">
+            <div class="key" data-key="A">A</div>
+            <div class="key" data-key="S">S</div>
+            <div class="key" data-key="D">D</div>
+            <div class="key" data-key="F">F</div>
+            <div class="key" data-key="G">G</div>
+            <div class="key" data-key="H">H</div>
+            <div class="key" data-key="J">J</div>
+            <div class="key" data-key="K">K</div>
+            <div class="key" data-key="L">L</div>
+          </div>
+          <!-- Row 4: Z X C V B N M -->
+          <div class="kb-row">
+            <div class="key" data-key="Z">Z</div>
+            <div class="key" data-key="X">X</div>
+            <div class="key" data-key="C">C</div>
+            <div class="key" data-key="V">V</div>
+            <div class="key" data-key="B">B</div>
+            <div class="key" data-key="N">N</div>
+            <div class="key" data-key="M">M</div>
+          </div>
+          <!-- Space bar -->
+          <div class="kb-row">
+            <div class="key key-space" data-key=" ">SPACE BAR</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- On-screen helper tip -->
+    <div class="game-instruction-bar">
+      <span>🎯 Press the highlighted key quickly! You can use your physical keyboard or tap the visual keys.</span>
+    </div>
+  </section>
+
+
+  <!-- ========================================================
+       MODAL: RESULTS / GAME OVER DIALOG
+       ======================================================== -->
+  <div id="results-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div id="modal-status-icon" class="modal-icon">🏆</div>
+        <h2 id="modal-title" class="modal-title">Game Over!</h2>
+        <p id="modal-subtitle" class="modal-subtitle">Great effort! Here is your performance summary.</p>
+      </div>
+
+      <div class="modal-stats-grid">
+        <div class="summary-stat-box">
+          <span class="summary-label">Final Score</span>
+          <span id="summary-score" class="summary-value highlight">0</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="summary-label">Accuracy</span>
+          <span id="summary-accuracy" class="summary-value">100%</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="summary-label">Correct Hits</span>
+          <span id="summary-correct" class="summary-value text-green">0</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="summary-label">Misses / Errors</span>
+          <span id="summary-misses" class="summary-value text-red">0</span>
+        </div>
+        <div class="summary-stat-box col-span-2">
+          <span id="summary-extra-label" class="summary-label">Average Response Time</span>
+          <span id="summary-extra-value" class="summary-value">0 ms</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="modal-play-again-btn" class="primary-btn">
+          <span>🔄 Play Again</span>
+        </button>
+        <button id="modal-main-menu-btn" class="secondary-btn">
+          <span>🏠 Main Menu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript File -->
+  <script src="script.js"></script>
+</body>
+</html>
