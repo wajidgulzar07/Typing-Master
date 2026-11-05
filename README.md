@@ -11,7 +11,7 @@ A fast, fun, browser-based typing game that trains **letter recognition, typing 
 > COMSATS University Islamabad, Vehari Campus · BS Software Engineering
 > Instructor: Yasmeen Jana · CLO4 – Markup & Scripting Client-Side Technologies
 
-![Home screen](screenshots/home-easy.png)
+![Home screen](assets/p1.png)
 
 ---
 
@@ -65,15 +65,15 @@ A fast, fun, browser-based typing game that trains **letter recognition, typing 
 
 | Home – Easy | Home – Hard |
 |---|---|
-| ![Home Easy](screenshots/home-easy.png) | ![Home Hard](screenshots/home-hard.png) |
+| ![Home Easy](assets/p2.png) | ![Home Hard](screenshots/home-hard.png) |
 
 | Bubbles – Playing | Bubbles – Feedback |
 |---|---|
-| ![Bubbles playing](screenshots/bubbles-playing.png) | ![Bubbles feedback](screenshots/bubbles-feedback.png) |
+| ![Bubbles playing](assets/p3.png) | ![Bubbles feedback](assets/p4.png) |
 
 | Bubbles – Game Over | KeyMagnet – Target |
 |---|---|
-| ![Bubbles game over](screenshots/bubbles-gameover.png) | ![KeyMagnet target](screenshots/keymagnet-target.png) |
+| ![Bubbles game over](assets/p5.png) | ![KeyMagnet target](assets/p8.png) |
 
 | KeyMagnet – Correct | KeyMagnet – Wrong |
 |---|---|
